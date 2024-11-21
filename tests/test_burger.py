@@ -168,11 +168,9 @@ class TestBurger:
 
             # Выполняю тестируемый метод
             receipt = burger.get_receipt()
-            print(receipt)
 
         expected_receipt = (
             f'(==== {bun_name} ====)\n= {ingredient_type.lower()} {ingredient_name} =\n(==== {bun_name} ====)\n'
             f'\nPrice: {price}')
-        print(expected_receipt)
 
         assert receipt == expected_receipt, "Результат неверный"
