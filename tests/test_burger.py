@@ -2,22 +2,20 @@ import pytest
 from unittest.mock import Mock, patch
 
 from praktikum.burger import Burger
+from praktikum import ingredient_types
+from tests.data import DataBun, DataIngredient
 
 
 class TestBurger:
 
-    def test_init_bun(self):
+    def test_init_burger(self):
         burger = Burger()
-        assert burger.bun is None, "Инициализация класса отрабатывает неверно"
-
-    def test_init_ingredients(self):
-        burger = Burger()
-        assert burger.ingredients == [], "Инициализация класса отрабатывает неверно"
+        assert burger.bun is None and burger.ingredients == [], "Инициализация класса отрабатывает неверно"
 
     @pytest.mark.parametrize('name, price', [
-        ("Фиолетовая", 18.0),
-        ("Желтая", 19.0),
-        ("Пурпурная", 20.0)
+        (DataBun.NAME[0], DataBun.PRICE[0]),
+        (DataBun.NAME[1], DataBun.PRICE[1]),
+        (DataBun.NAME[2], DataBun.PRICE[2])
     ])
     def test_set_buns(self, name, price):
         burger = Burger()
@@ -37,9 +35,9 @@ class TestBurger:
         assert burger.bun is mock_bun and burger.bun.name == name and burger.bun.price == price
 
     @pytest.mark.parametrize("ingredient_type, name, price", [
-        ('Соус', 'Мазик', 15.0),
-        ('Специи', 'Перец', 16.0),
-        ('Овощи', 'Помидор', 17.0)
+        (ingredient_types.INGREDIENT_TYPE_SAUCE, DataIngredient.NAME[0], DataIngredient.PRICE[0]),
+        (ingredient_types.INGREDIENT_TYPE_SAUCE, DataIngredient.NAME[1], DataIngredient.PRICE[1]),
+        (ingredient_types.INGREDIENT_TYPE_FILLING, DataIngredient.NAME[2], DataIngredient.PRICE[2])
     ])
     def test_add_ingredient(self, ingredient_type, name, price):
         burger = Burger()
@@ -61,24 +59,24 @@ class TestBurger:
                 and burger.ingredients[0].ingredient_type == ingredient_type and burger.ingredients[0].name == name and
                 burger.ingredients[0].price == price)
 
-    @pytest.mark.parametrize("index, name", [
-        (0, "Перец"),
-        (1, "Горчица")
+    @pytest.mark.parametrize("index, name, price", [
+        (0, DataIngredient.NAME[0], DataIngredient.PRICE[0]),
+        (1, DataIngredient.NAME[1], DataIngredient.PRICE[1])
     ])
-    def test_remove_ingredient(self, index, name):
+    def test_remove_ingredient(self, index, name, price):
         burger = Burger()
 
         # Создаю Мок объект, имитирующий Ingredient 1
         mock_ingredient = Mock()
-        mock_ingredient.ingredient_type = "Соус"
-        mock_ingredient.name = "Горчица"
-        mock_ingredient.price = 16.0
+        mock_ingredient.ingredient_type = ingredient_types.INGREDIENT_TYPE_SAUCE
+        mock_ingredient.name = name
+        mock_ingredient.price = price
 
         # Создаю Мок объект, имитирующий Ingredient 2
         mock_ingredient_2 = Mock()
-        mock_ingredient_2.ingredient_type = "Специи"
-        mock_ingredient_2.name = "Перец"
-        mock_ingredient_2.price = 17.0
+        mock_ingredient_2.ingredient_type = ingredient_types.INGREDIENT_TYPE_SAUCE
+        mock_ingredient_2.name = name
+        mock_ingredient_2.price = price
 
         # Записываем объекты в параметр объекта класса Burger()
         burger.ingredients = [mock_ingredient, mock_ingredient_2]
@@ -94,23 +92,23 @@ class TestBurger:
         assert len(burger.ingredients) == 1 and burger.ingredients[0].name == name
 
     @pytest.mark.parametrize('index, new_index, ingredient_type', [
-        (0, 1, 'Соус'),
-        (1, 0, 'Специи'),
+        (0, 1, ingredient_types.INGREDIENT_TYPE_SAUCE),
+        (1, 0, ingredient_types.INGREDIENT_TYPE_FILLING),
     ])
     def test_move_ingredient(self, index, new_index, ingredient_type):
         burger = Burger()
 
         # Создаю Мок объект, имитирующий Ingredient 1
         mock_ingredient = Mock()
-        mock_ingredient.ingredient_type = "Соус"
-        mock_ingredient.name = "Горчица"
-        mock_ingredient.price = 16.0
+        mock_ingredient.ingredient_type = ingredient_types.INGREDIENT_TYPE_SAUCE
+        mock_ingredient.name = DataIngredient.NAME[0]
+        mock_ingredient.price = DataIngredient.PRICE[0]
 
         # Создаю Мок объект, имитирующий Ingredient 2
         mock_ingredient_2 = Mock()
-        mock_ingredient_2.ingredient_type = "Специи"
-        mock_ingredient_2.name = "Перец"
-        mock_ingredient_2.price = 17.0
+        mock_ingredient_2.ingredient_type = ingredient_types.INGREDIENT_TYPE_FILLING
+        mock_ingredient_2.name = DataIngredient.NAME[1]
+        mock_ingredient_2.price = DataIngredient.PRICE[1]
 
         # Записываем объекты в параметр объекта класса Burger()
         burger.ingredients = [mock_ingredient, mock_ingredient_2]
@@ -125,9 +123,9 @@ class TestBurger:
         assert burger.ingredients[new_index].ingredient_type == ingredient_type
 
     @pytest.mark.parametrize('value_1, value_2, value_3, result', [
-        (1.0, 2.0, 3.0, 7.0),
-        (2.0, 3.0, 6.0, 13.0),
-        (3.0, 6.0, 8.0, 20.0)
+        (DataBun.PRICE[0], DataIngredient.PRICE[0], DataIngredient.PRICE[1], 500.0),
+        (DataBun.PRICE[1], DataIngredient.PRICE[1], DataIngredient.PRICE[2], 900.0),
+        (DataBun.PRICE[2], DataIngredient.PRICE[0], DataIngredient.PRICE[2], 1000.0)
     ])
     def test_get_price(self, value_1, value_2, value_3, result):
         burger = Burger()
@@ -142,7 +140,7 @@ class TestBurger:
         ingredient_mock.get_price.return_value = value_2
         burger.ingredients.append(ingredient_mock)
 
-        # Создаю Мок имитирующий вызов метода get_price у объекта ingredient_mock класса Ingredient
+        # Создаю Мок имитирующий вызов метода get_price у объекта ingredient_mock_2 класса Ingredient
         ingredient_mock_2 = Mock()
         ingredient_mock_2.get_price.return_value = value_3
         burger.ingredients.append(ingredient_mock_2)
@@ -150,8 +148,8 @@ class TestBurger:
         assert burger.get_price() == result
 
     @pytest.mark.parametrize('bun_name, ingredient_type, ingredient_name, price', [
-        ("Хлеб", "Соус", "Мазик", 150),
-        ("Булка", "Приправа", "Перец", 200),
+        (DataBun.NAME[0], ingredient_types.INGREDIENT_TYPE_SAUCE, DataIngredient.NAME[0], 150),
+        (DataBun.NAME[1], ingredient_types.INGREDIENT_TYPE_FILLING, DataIngredient.NAME[2], 150)
     ])
     def test_get_receipt(self, bun_name, ingredient_type, ingredient_name, price):
         burger = Burger()
@@ -172,8 +170,9 @@ class TestBurger:
             receipt = burger.get_receipt()
             print(receipt)
 
-        expected_receipt = (f'(==== {bun_name} ====)\n= {ingredient_type.lower()} {ingredient_name} =\n(==== {bun_name} ====)\n'
-                            f'\nPrice: {price}')
+        expected_receipt = (
+            f'(==== {bun_name} ====)\n= {ingredient_type.lower()} {ingredient_name} =\n(==== {bun_name} ====)\n'
+            f'\nPrice: {price}')
         print(expected_receipt)
 
         assert receipt == expected_receipt, "Результат неверный"
