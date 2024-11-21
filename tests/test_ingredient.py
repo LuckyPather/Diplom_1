@@ -18,13 +18,13 @@ class TestIngredient:
 
     def test_get_price(self, ingredient_type, name, price):
         ingredient = Ingredient(ingredient_type, name, price)
-        assert ingredient.price == price, "Метод получения цены работает некорректно"
+        assert ingredient.get_price() == price, "Метод получения цены работает некорректно"
 
     def test_get_name(self, ingredient_type, name, price):
         ingredient = Ingredient(ingredient_type, name, price)
-        assert ingredient.name == name, "Метод получения имени работает некорректно"
+        assert ingredient.get_name() == name, "Метод получения имени работает некорректно"
 
     def test_get_type(self, ingredient_type, name, price):
         ingredient = Ingredient(ingredient_type, name, price)
-        assert ingredient.type == ingredient_type, "Метод получения типа работает некорректно"
+        assert ingredient.get_type() == ingredient_type, "Метод получения типа работает некорректно"
 
